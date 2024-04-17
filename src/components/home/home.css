@@ -1,0 +1,25 @@
+.homepage {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+  }
+  
+  .homepage h1, .homepage h2 {
+    text-align: center;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    margin: 10px 0;
+    padding: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  button {
+    margin-left: 10px;
+  }
+  
