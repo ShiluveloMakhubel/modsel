@@ -1,17 +1,12 @@
-// server.js
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 5000;
+const { Client } = require('pg');
 
-// Middleware
-app.use(express.json());
-
-// Routes
-app.get('/', (req, res) => {
-    res.send('Hello from the server!');
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+client.connect()
+  .then(() => console.log('Connected to the database'))
+  .catch(error => console.error('Error connecting to the database', error));
