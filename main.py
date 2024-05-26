@@ -8,6 +8,10 @@ import uuid
 import bcrypt
 from boto3.dynamodb.conditions import Attr
 from pydantic import BaseModel
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -22,8 +26,8 @@ class UserModules(BaseModel):
 
 dynamodb = boto3.resource(
     'dynamodb',
-    aws_access_key_id='AKIA5FTZFJQBUJAE37FA',
-    aws_secret_access_key='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',
+    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY'),
     region_name='eu-north-1'
 )
 
