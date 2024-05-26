@@ -64,24 +64,26 @@ const Homepage = ({ userId }) => {
   return (
     <div className="homepage">
       <h1>Select Modules</h1>
-      <div>
-        <h2>Available Modules</h2>
-        <ul>
-          {availableModules.map(module => (
-            <li key={module.Moduleid}>
-              {module.name} - {module.description}
-              <button onClick={() => handleRegister(module)}>Register</button>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <h2>Registered Modules</h2>
-        <ul>
-          {registeredModules.map(module => (
-            <li key={module.Moduleid}>{module.name}</li>
-          ))}
-        </ul>
+      <div className="modules-section">
+        <div className="available-modules">
+          <h2>Available Modules</h2>
+          <ul>
+            {availableModules.map(module => (
+              <li key={module.Moduleid}>
+                {module.name} - {module.description}
+                <button onClick={() => handleRegister(module)}>Register</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="registered-modules">
+          <h2>Registered Modules</h2>
+          <ul>
+            {registeredModules.map(module => (
+              <li key={module.Moduleid}>{module.name}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

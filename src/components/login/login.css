@@ -1,48 +1,29 @@
-/* LoginPage.css */
-.login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-   
-  }
-  
-  .login-form {
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .login-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #0052cc;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .login-button:hover {
-    background-color: #003d99;
-  }
-  
+.homepage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modules-section {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.available-modules,
+.registered-modules {
+  width: 45%;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 10px 0;
+}
+
+button {
+  margin-left: 10px;
+}
