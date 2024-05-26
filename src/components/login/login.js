@@ -1,15 +1,31 @@
-// LoginPage.js
 import React, { useState } from 'react';
-import './login.css'; // Make sure to create a corresponding CSS file for styling
+import { useNavigate } from 'react-router-dom';
+import './login.css';
+import axios from 'axios';
 
-const Login = () => {
+const Login = ({ setUserId }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log('Login credentials:', email, password);
-    // Here you would add your logic to handle the login (e.g., API call)
+    
+    axios.get(`http://localhost:8000/login?email=${email}&password=${password}`)
+      .then(response => {
+        
+        if (response.data.exists) {
+          setUserId(response.data.Userid);
+          navigate('/home');
+        } else {
+          setError(response.data.message);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        setError('An error occurred. Please try again.');
+      });
   };
 
   return (
@@ -37,6 +53,7 @@ const Login = () => {
           />
         </div>
         <button type="submit" className="login-button">Login</button>
+        {error && <p className="error-msg">{error}</p>}
       </form>
     </div>
   );
