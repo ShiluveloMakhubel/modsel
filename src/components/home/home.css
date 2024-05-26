@@ -1,25 +1,25 @@
 .homepage {
-    display: flex;
-    justify-content: space-around;
-    padding: 20px;
-  }
-  
-  .homepage h1, .homepage h2 {
-    text-align: center;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  li {
-    margin: 10px 0;
-    padding: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  button {
-    margin-left: 10px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modules-section {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.available-modules,
+.registered-modules {
+  flex: 1;
+  margin: 10px;
+}
+
+ul {
+  list-style-type: none;
+}
+
+li {
+  margin: 5px 0;
+}

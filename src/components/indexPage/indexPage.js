@@ -1,6 +1,7 @@
 import './indexPage.css';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
+import axios from 'axios';
 
 const IndexPage = () => {
   let navigate = useNavigate();
@@ -29,6 +30,7 @@ const IndexPage = () => {
           <button onClick={handleSignup} className="button">Signup</button>
         </div>
       </div>
+      
     </div>
   );
 };
