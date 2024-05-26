@@ -57,13 +57,33 @@ const Homepage = ({ userId }) => {
     }
   };
 
+  const handleRemove = async (module) => {
+    console.log(`Removing module: ${module.name} with ID: ${module.Moduleid}`);
+    try {
+      const response = await axios.post('http://localhost:8000/remove_user_module', {
+        Userid: userId,
+        Moduleid: module.Moduleid
+      });
+      console.log('Response from server:', response.data);
+
+      console.log('Module removed successfully:', module.name);
+      setAvailableModules(prev => [...prev, module]);
+      setRegisteredModules(prev => prev.filter(m => m.Moduleid !== module.Moduleid));
+    } catch (error) {
+      console.error('Error removing module:', error);
+      setError('Error removing module. Please try again later.');
+    }
+  };
+
   if (error) {
     return <div>{error}</div>;
   }
 
   return (
     <div className="homepage">
-      <h1>Select Modules</h1>
+      <div>
+        <h1>Select Modules</h1>
+      </div>
       <div className="modules-section">
         <div className="available-modules">
           <h2>Available Modules</h2>
@@ -80,7 +100,10 @@ const Homepage = ({ userId }) => {
           <h2>Registered Modules</h2>
           <ul>
             {registeredModules.map(module => (
-              <li key={module.Moduleid}>{module.name}</li>
+              <li key={module.Moduleid}>
+                {module.name}
+                <button onClick={() => handleRemove(module)}>Remove</button>
+              </li>
             ))}
           </ul>
         </div>

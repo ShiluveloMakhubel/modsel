@@ -18,7 +18,7 @@ function App  ( ){
             <Route path='/' exact element={<IndexPage/>}/>
             <Route path="/login" element={<Login setUserId={setUserId} />} />
             <Route path="/home" element={<Homepage userId={userId} />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/signup" element={<Signup setUserId={setUserId}/>} />
             <Route path="/profile" element={<Profile />} />
             <Route path='*' element={<h1>Not Found</h1>}/>
 

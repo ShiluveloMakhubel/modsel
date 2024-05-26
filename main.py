@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import boto3
@@ -10,10 +10,20 @@ from boto3.dynamodb.conditions import Attr
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
+import random
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 load_dotenv()
 
 app = FastAPI()
+
+class User(BaseModel):
+    username: str
+    email: str
+    password: str
+    pin: str = None
 
 class Module(BaseModel):
     Moduleid: str
@@ -23,6 +33,10 @@ class Module(BaseModel):
 class UserModules(BaseModel):
     Userid: str
     Moduleid: str
+
+class VerifyPinRequest(BaseModel):
+    email: str
+    pin: str
 
 dynamodb = boto3.resource(
     'dynamodb',
@@ -44,6 +58,73 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def send_pin_via_email(email: str, pin: str):
+    sender_email = os.getenv('SENDER_EMAIL')
+    sender_password = os.getenv('SENDER_PASSWORD')
+
+    if not sender_email or not sender_password:
+        raise ValueError("Missing sender email or password in environment variables.")
+
+    print(f"Sender email: {sender_email}")
+    print(f"Recipient email: {email}")
+    print(f"PIN: {pin}")
+
+    subject = "Your Verification PIN"
+    body = f"Your verification PIN is {pin}"
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = subject
+    message["From"] = sender_email
+    message["To"] = email
+
+    part = MIMEText(body, "plain")
+    message.attach(part)
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, email, message.as_string())
+            print("Email sent successfully")
+    except smtplib.SMTPAuthenticationError as e:
+        print("Failed to authenticate with SMTP server:", e)
+        raise
+    except Exception as e:
+        print("Failed to send email:", e)
+        raise
+
+@app.post("/send_pin")
+async def send_pin(request: Request):
+    data = await request.json()
+    email = data.get('email')
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+    
+    pin = str(random.randint(100000, 999999))
+    table = dynamodb.Table('Users')
+    response = table.scan(FilterExpression=Attr('Email').eq(email))
+    items = response['Items']
+    if items:
+        table.update_item(
+            Key={'Userid': items[0]['Userid']},
+            UpdateExpression="set pin = :p",
+            ExpressionAttributeValues={':p': pin}
+        )
+    else:
+        table.put_item(Item={'Userid': str(uuid.uuid4()), 'Email': email, 'pin': pin})
+
+    send_pin_via_email(email, pin)
+    return {"message": "PIN sent to email"}
+
+@app.post("/verify_pin")
+async def verify_pin(verify_request: VerifyPinRequest):
+    table = dynamodb.Table('Users')
+    response = table.scan(FilterExpression=Attr('Email').eq(verify_request.email))
+    items = response['Items']
+    if items and items[0].get('pin') == verify_request.pin:
+        return {"verified": True}
+    else:
+        return {"verified": False, "message": "Invalid PIN"}
+
 @app.get("/modules")
 def get_modules():
     try:
@@ -64,6 +145,20 @@ async def add_user_module(usermodules: UserModules):
         }
         table.put_item(Item=item)
         return {"message": "User module added successfully"}
+    except ClientError as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@app.post("/remove_user_module")
+async def remove_user_module(usermodules: UserModules):
+    try:
+        table = dynamodb.Table('usermodules')
+        table.delete_item(
+            Key={
+                'Userid': usermodules.Userid,
+                'Moduleid': usermodules.Moduleid
+            }
+        )
+        return {"message": "User module removed successfully"}
     except ClientError as e:
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
@@ -133,13 +228,11 @@ async def login(email: str, password: str):
         items = response['Items']
         if len(items) == 0:
             return {"exists": False, "message": "Email not found"}
-        elif len(items) == 1:
+        else:
             hashed_password = items[0]['password']
             if bcrypt.checkpw(password.encode(), bytes(hashed_password)):
                 return {"exists": True, "message": "Login successful", "Userid": items[0]['Userid']}
             else:
                 return {"exists": False, "message": "Wrong password"}
-        else:
-            return {"exists": False, "message": "Multiple users found with the same email"}
     except ClientError as e:
         return {"exists": False, "error": str(e)}
