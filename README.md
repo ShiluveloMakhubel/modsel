@@ -1,4 +1,4 @@
-# Cloud-Based Module Registration System
+# Modsel
 
 This project is a cloud-based module registration system that showcases the understanding of cloud security principles. It allows students to log in and register for modules, with roles and access controls implemented for different types of users (admin and student).
 
