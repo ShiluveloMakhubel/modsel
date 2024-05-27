@@ -2,6 +2,8 @@
 
 This project is a cloud-based module registration system that showcases the understanding of cloud security principles. It allows students to log in and register for modules, with roles and access controls implemented for different types of users (admin and student).
 
+website http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com
+
 ## Features
 
 - Secure communication using HTTPS
@@ -28,5 +30,3 @@ This project is a cloud-based module registration system that showcases the unde
    run: npm install
    run server: npm install
    run frontend: npm start
-
-   ## http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com
