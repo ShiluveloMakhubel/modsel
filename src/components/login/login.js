@@ -12,7 +12,7 @@ const Login = ({ setUserId, setRole }) => {
   const handleLogin = (e) => {
     e.preventDefault();
     
-    axios.get(`http://localhost:8000/login?email=${email}&password=${password}`)
+    axios.get(`http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com:8000/login?email=${email}&password=${password}`)
       .then(response => {
         if (response.data.exists) {
           setUserId(response.data.Userid);

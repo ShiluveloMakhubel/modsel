@@ -24,7 +24,7 @@ function Signup() {
   };
 
   const handleSendPin = () => {
-    axios.post('http://localhost:8000/send_pin', { email: formData.email })
+    axios.post('http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com:8000/send_pin', { email: formData.email })
       .then(response => {
         console.log(response.data.message);
         setPinSent(true);
@@ -36,7 +36,7 @@ function Signup() {
   };
 
   const handleVerifyPin = () => {
-    axios.post('http://localhost:8000/verify_pin', { email: formData.email, pin: formData.pin })
+    axios.post('http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com:8000/verify_pin', { email: formData.email, pin: formData.pin })
       .then(response => {
         if (response.data.verified) {
           setPinVerified(true);
@@ -71,7 +71,7 @@ function Signup() {
       return;
     }
 
-    axios.post("http://localhost:8000/submitdata", formData)
+    axios.post("http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com:8000/submitdata", formData)
       .then(response => {
         console.log(response.data);
         navigate('/login'); // Navigate to homepage on successful signup

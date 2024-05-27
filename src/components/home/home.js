@@ -14,8 +14,8 @@ const Homepage = ({ userId, role }) => {
       try {
         console.log("Fetching modules and user registered modules...");
         const [modulesResponse, userModulesResponse] = await Promise.all([
-          axios.get('http://localhost:8000/modules'),
-          axios.get(`http://localhost:8000/user_modules/${userId}`)
+          axios.get('http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com:8000/modules'),
+          axios.get(`http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com:8000/user_modules/${userId}`)
         ]);
 
         const allModules = modulesResponse.data;
@@ -43,7 +43,7 @@ const Homepage = ({ userId, role }) => {
   const handleRegister = async (module) => {
     console.log(`Registering module: ${module.name} with ID: ${module.Moduleid}`);
     try {
-      const response = await axios.post('http://localhost:8000/add_user_module', {
+      const response = await axios.post('http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com:8000/add_user_module', {
         Userid: userId,
         Moduleid: module.Moduleid
       });
@@ -61,7 +61,7 @@ const Homepage = ({ userId, role }) => {
   const handleRemove = async (module) => {
     console.log(`Removing module: ${module.name} with ID: ${module.Moduleid}`);
     try {
-      const response = await axios.post('http://localhost:8000/remove_user_module', {
+      const response = await axios.post('http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com:8000/remove_user_module', {
         Userid: userId,
         Moduleid: module.Moduleid
       });
@@ -80,7 +80,7 @@ const Homepage = ({ userId, role }) => {
     e.preventDefault();
     console.log(`Adding new module: ${newModule.name}`);
     try {
-      const response = await axios.post('http://localhost:8000/add_module', {
+      const response = await axios.post('http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com:8000/add_module', {
         name: newModule.name,
         description: newModule.description
       });
