@@ -50,7 +50,7 @@ dynamodb = boto3.resource(
 
 # Set up CORS
 origins = [
-    "http://localhost:3000",
+    "http://ec2-13-50-45-196.eu-north-1.compute.amazonaws.com",
 ]
 
 app.add_middleware(
