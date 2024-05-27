@@ -14,6 +14,7 @@ import random
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from fastapi import Depends, HTTPException, status
 
 load_dotenv()
 
@@ -23,7 +24,9 @@ class User(BaseModel):
     username: str
     email: str
     password: str
+    role: str = "student"  # Default role is student
     pin: str = None
+
 
 class Module(BaseModel):
     Moduleid: str
@@ -202,11 +205,54 @@ async def submitdata(data: dict):
         'Userid': str(uuid.uuid4()),
         'username': data['username'],
         'password': hashed_password,
-        'Email': data['email']
+        'Email': data['email'],
+        'role': data.get('role', 'student')  # Get role from data, default to student
     }
     table.put_item(Item=item)
     print(data)
     return "data submitted successfully"
+
+def get_current_user_role(email: str):
+    table = dynamodb.Table('Users')
+    response = table.scan(FilterExpression=Attr('Email').eq(email))
+    items = response['Items']
+    if len(items) == 1:
+        return items[0]['role']
+    else:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+
+def admin_required(email: str = Depends(get_current_user_role)):
+    if email != 'admin':
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+
+@app.post("/add_module")
+async def add_module(data: dict):
+    try:
+        table = dynamodb.Table('modules')
+        item = {
+            'Moduleid': str(uuid.uuid4()),
+            'name': module.name,
+            'description': module.description
+        }
+        table.put_item(Item=item)
+        return item
+    except ClientError as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@app.put("/update_module/{module_id}", dependencies=[Depends(admin_required)])
+async def update_module(module_id: str, module: Module):
+    try:
+        table = dynamodb.Table('modules')
+        table.update_item(
+            Key={'Moduleid': module_id},
+            UpdateExpression="set #name = :n, description = :d",
+            ExpressionAttributeNames={'#name': 'name'},
+            ExpressionAttributeValues={':n': module.name, ':d': module.description}
+        )
+        return {"message": "Module updated successfully"}
+    except ClientError as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
 
 @app.get("/checkEmail")
 async def check_email(email: str):
@@ -231,7 +277,7 @@ async def login(email: str, password: str):
         else:
             hashed_password = items[0]['password']
             if bcrypt.checkpw(password.encode(), bytes(hashed_password)):
-                return {"exists": True, "message": "Login successful", "Userid": items[0]['Userid']}
+                return {"exists": True, "message": "Login successful", "Userid": items[0]['Userid'],"role": items[0]['role']}
             else:
                 return {"exists": False, "message": "Wrong password"}
     except ClientError as e:

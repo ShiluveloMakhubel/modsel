@@ -12,12 +12,13 @@ import './App.css';
  
 function App  ( ){
   const [userId, setUserId] = useState('')
+  const [role, setRole] = useState(null);
   return (
     <Router>
             <Routes>
             <Route path='/' exact element={<IndexPage/>}/>
-            <Route path="/login" element={<Login setUserId={setUserId} />} />
-            <Route path="/home" element={<Homepage userId={userId} />} />
+            <Route path="/login" element={<Login setUserId={setUserId}  setRole={setRole}/>} />
+            <Route path="/home" element={<Homepage userId={userId} role={role}/>} />
             <Route path="/signup" element={<Signup setUserId={setUserId}/>} />
             <Route path="/profile" element={<Profile />} />
             <Route path='*' element={<h1>Not Found</h1>}/>

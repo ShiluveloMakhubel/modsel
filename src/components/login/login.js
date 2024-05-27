@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './login.css';
 import axios from 'axios';
+import './login.css';
 
-const Login = ({ setUserId }) => {
+const Login = ({ setUserId, setRole }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,9 +14,10 @@ const Login = ({ setUserId }) => {
     
     axios.get(`http://localhost:8000/login?email=${email}&password=${password}`)
       .then(response => {
-        
         if (response.data.exists) {
           setUserId(response.data.Userid);
+          setRole(response.data.role); // Store role
+          console.log('mrdr',response.data.role);
           navigate('/home');
         } else {
           setError(response.data.message);

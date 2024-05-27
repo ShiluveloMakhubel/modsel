@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './home.css';
 
-const Homepage = ({ userId }) => {
+const Homepage = ({ userId, role }) => {
   const [availableModules, setAvailableModules] = useState([]);
   const [registeredModules, setRegisteredModules] = useState([]);
+  const [newModule, setNewModule] = useState({ name: '', description: '' });
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -75,38 +76,79 @@ const Homepage = ({ userId }) => {
     }
   };
 
+  const handleAddModule = async (e) => {
+    e.preventDefault();
+    console.log(`Adding new module: ${newModule.name}`);
+    try {
+      const response = await axios.post('http://localhost:8000/add_module', {
+        name: newModule.name,
+        description: newModule.description
+      });
+      console.log('Response from server:', response.data);
+
+      console.log('Module added successfully:', newModule.name);
+      setAvailableModules(prev => [...prev, response.data]);
+      setNewModule({ name: '', description: '' });
+    } catch (error) {
+      console.error('Error adding module:', error);
+      setError('Error adding module. Please try again later.');
+    }
+  };
+
   if (error) {
     return <div>{error}</div>;
   }
 
   return (
     <div className="homepage">
+      <h1>Select Modules</h1>
+      {role === 'admin' && (
+        <div>
+          <h2>Add New Module</h2>
+          <form onSubmit={handleAddModule}>
+            <div>
+              <label>Module Name:</label>
+              <input
+                type="text"
+                value={newModule.name}
+                onChange={(e) => setNewModule({ ...newModule, name: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label>Module Description:</label>
+              <input
+                type="text"
+                value={newModule.description}
+                onChange={(e) => setNewModule({ ...newModule, description: e.target.value })}
+                required
+              />
+            </div>
+            <button type="submit">Add Module</button>
+          </form>
+        </div>
+      )}
       <div>
-        <h1>Select Modules</h1>
+        <h2>Available Modules</h2>
+        <ul>
+          {availableModules.map(module => (
+            <li key={module.Moduleid}>
+              {module.name} - {module.description}
+              <button onClick={() => handleRegister(module)}>Register</button>
+            </li>
+          ))}
+        </ul>
       </div>
-      <div className="modules-section">
-        <div className="available-modules">
-          <h2>Available Modules</h2>
-          <ul>
-            {availableModules.map(module => (
-              <li key={module.Moduleid}>
-                {module.name} - {module.description}
-                <button onClick={() => handleRegister(module)}>Register</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="registered-modules">
-          <h2>Registered Modules</h2>
-          <ul>
-            {registeredModules.map(module => (
-              <li key={module.Moduleid}>
-                {module.name}
-                <button onClick={() => handleRemove(module)}>Remove</button>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div>
+        <h2>Registered Modules</h2>
+        <ul>
+          {registeredModules.map(module => (
+            <li key={module.Moduleid}>
+              {module.name}
+              <button onClick={() => handleRemove(module)}>Remove</button>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
